@@ -48,12 +48,26 @@ var poker = (function () {
 			return true;
 		},
 		contains_straight = function () {
-			var i;
+			var i,
+					aceSwapped = false;
+
 			for (i = 0; i < ranks.length-1; i++) {
+				
+				if (i === 0 && ranks[0] === 2 && ranks[4] === 14) {
+					// using ace as a 1
+					ranks[4] = 1;
+					aceSwapped = true;
+					sort_ranks();
+				}
+
 				if ((ranks[i] + 1) !== ranks[i+1]) {
+					// ace was used as a 1, reset it to a high ace
+					if (aceSwapped) make_high_ace();
 					return false;
 				}
 			}
+
+			if (aceSwapped) make_high_ace();
 			return true;
 		},
 		contains_3_of_kind = function () {
@@ -141,10 +155,14 @@ var poker = (function () {
 			result.error = error;
 			return result;
 		},
-		create_card_count = function() {
+		create_card_count = function () {
 			ranks.map(function (value) {
 				map[value]++;
 			});
+		},
+		make_high_ace = function () {
+			ranks[0] = 14;
+			sort_ranks();
 		},
 		init_data_structures = function () {
 			suits.length = 0;
